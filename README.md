@@ -1,4 +1,4 @@
-# GIDEON — Nexora Growth Agent 
+# GIDEON — Nexora's Growth Agent 
 
 A Gideon-style AI chief of staff for Nexora Studio: autonomous research, prospecting,
 outreach, CEO-style reporting — with data screens, voice, and self-improvement.
