@@ -44,10 +44,44 @@ boundaries, real case studies (States Barbershop), testimonials, capacity.
 
 ---
 
+## 2A. The Brain — Gideon's Own Mind (owner decision: build from scratch)
+
+**Decision:** No paid APIs. No downloaded pre-trained models. Gideon thinks with a brain
+**built in this repo** using standard ML libraries (PyTorch, CPU build), trained from
+random initialization on text we gather ourselves. Libraries are tools — like textbooks
+for a child — not someone else's mind.
+
+**Architecture (all written here):**
+- **Own tokenizer:** byte-pair encoding implemented in-repo, trained on our corpus
+- **Decoder-only transformer** (GPT-style), PyTorch, from-scratch initialization
+- **GPU-ready from day one:** everything config-driven (`device: cpu|cuda`); when a GPU
+  is purchased, the same code trains bigger models with zero rewrite
+- Checkpoints live in `data/brain/` — our disk, our weights, ours
+
+**Training data (the curriculum):** Nexora's own materials → publicly available text we
+collect → Gideon's own approved messages + outcomes (what actually earned replies).
+Like a human: it becomes *unique* by being raised on Nexora's way of thinking.
+
+**Growth path:**
+| Stage | Params | Hardware | Trains in | Can do |
+|---|---|---|---|---|
+| v0-nano | ~1–3M | your CPU, 6 GB RAM | hours per run | grammar, short phrases, scoring |
+| v1 | ~10–50M | CPU (slow) / small GPU | days | short messages, summaries |
+| v2 | ~100M–1B | the GPU you buy | days–week | real writing & reasoning |
+
+**Honest expectations:** v0 is an *infant*. Early phases lean on rules, retrieval and
+statistical modules — also ours, also trained here — while the brain grows. Fluency
+ramps with data + scale; the Gideon voice emerges from the curriculum, not from a vendor.
+**Cost forever: $0 + electricity.**
+
+---
+
 ## 3. Core Modules
 
 ### M1 — Brain & Memory
-- Local LLM (Ollama) + SQLite knowledge store with embeddings for recall.
+- **Gideon's own brain** (Phase 1 — built from scratch) + SQLite knowledge store with
+  locally computed retrieval (TF-IDF/bag-of-words now, brain embeddings later —
+  no external embedding APIs, ever).
 - Stores: Nexora profile (learned from site/docs), Delivery Ledger, facts with **source URL + date**, conversation history, decisions log.
 
 ### M2 — Target-Driven Learning
@@ -145,7 +179,7 @@ learned. Grounded in Delivery Ledger.
 
 | Layer | Choice | Why |
 |---|---|---|
-| LLM | Ollama (Qwen/Llama-class model) | Free, private, local; optional hybrid API for hard tasks |
+| **Brain** | **Own transformer (PyTorch CPU)** — built from scratch in-repo | $0 forever: no API, no downloaded weights; `cuda` switch ready for future GPU |
 | Backend | Python 3.11+ / FastAPI | Fits scraping, scheduling, AI ecosystem |
 | Memory | SQLite + local embeddings (chromadb/sqlite-vec) | Zero-infra, portable |
 | Scraping | requests + BeautifulSoup / Playwright | robots.txt-aware, rate-limited |
@@ -157,34 +191,41 @@ learned. Grounded in Delivery Ledger.
 | Code agent | Git + pytest + sandboxed exec | Ship gate = tests pass; rollback = git revert |
 | PC scheduling | Windows Task Scheduler / service | Runs even when closed |
 
-**Costs:** LLM local = $0. Optional hybrid API + email service free tiers = small monthly.
+**Costs:** brain = **$0 forever** (electricity only; PyTorch is a free pip-installable
+library, not a model). Email free tiers sufficient to start. GPU purchase optional later.
 Search free tiers sufficient at start.
 
 ---
 
 ## 6. Build Phases (each ends with a working, testable milestone)
 
-- [ ] **Phase 0 — Foundation:** repo, Python env, Ollama running, dashboard skeleton, git.
-- [ ] **Phase 1 — Identity:** learn Nexora (site ingested), build Delivery Ledger, constitution
+- [x] **Phase 0 — Foundation:** project structure, storage layout, constitution, test suite,
+      git safety net, React+TS dashboard. **COMPLETE — 24/24 tests, build + serve smoke green.**
+- [ ] **Phase 1 — The Brain v0:** our own tokenizer + decoder-only transformer trained from
+      scratch on CPU, `device: cpu|cuda` switch built in. *Test: it trains and generates text.*
+- [ ] **Phase 2 — Identity:** learn Nexora (site ingested), build Delivery Ledger, constitution
       (decision tiers, guardrails) encoded. *Test: ask it about Nexora → accurate, cited answers.*
-- [ ] **Phase 2 — Learning:** target-driven learning loop with approval UI. *Test: give it a
+- [ ] **Phase 3 — Learning:** target-driven learning loop with approval UI. *Test: give it a
       competitor URL → structured facts → approve → stored with source.*
-- [ ] **Phase 3 — Research engine:** morning sweep + watch list + opportunity detector +
+- [ ] **Phase 4 — Research engine:** morning sweep + watch list + opportunity detector +
       first morning briefing. *Test: wake up to a real briefing.*
-- [ ] **Phase 4 — Prospecting:** lead finder + scoring + pipeline/CRM. *Test: 10 real qualified
+- [ ] **Phase 5 — Prospecting:** lead finder + scoring + pipeline/CRM. *Test: 10 real qualified
       prospects with reasons.*
-- [ ] **Phase 5 — Outreach:** drafts + promise guardrail + approval flow + email sending +
+- [ ] **Phase 6 — Outreach:** drafts + promise guardrail + approval flow + email sending +
       WhatsApp relay + follow-ups. *Test: first approved outreach goes out.*
-- [ ] **Phase 6 — CEO reports:** evening report + morning plan/strategy suggestions. *Test: full
+- [ ] **Phase 7 — CEO reports:** evening report + morning plan/strategy suggestions. *Test: full
       day of autonomous action reported accurately.*
-- [ ] **Phase 7 — Evidence learning:** reply-rate tracking rewrites playbook. *Test: measurable
+- [ ] **Phase 8 — Gideon Display:** data screens — charts, tables, evidence panels pulled up
+      when explaining "why" or reporting; saved to `data/screens/`. *Test: briefing with a
+      pull-up evidence screen.*
+- [ ] **Phase 9 — Evidence learning:** reply-rate tracking rewrites playbook. *Test: measurable
       playbook change after enough replies.*
-- [ ] **Phase 8 — Voice + Gideon persona:** wake word, STT/TTS, persona across all surfaces.
+- [ ] **Phase 10 — Voice + Gideon persona:** wake word, STT/TTS, persona across all surfaces.
       *Test: voice briefing each morning.*
-- [ ] **Phase 9 — Content engine:** strategy-driven drafts with approval + tracking.
-- [ ] **Phase 10 — Code agent (site):** SEO audit → proposed fixes → approved changes to
+- [ ] **Phase 11 — Content engine:** strategy-driven drafts with approval + tracking.
+- [ ] **Phase 12 — Code agent (site):** SEO audit → proposed fixes → approved changes to
       nexoraio.vercel.app.
-- [ ] **Phase 11 — Code agent (self):** feature requests → plan → build → tests → register,
+- [ ] **Phase 13 — Code agent (self):** feature requests → plan → build → tests → register,
       with rollback.
 
 ---
@@ -208,15 +249,18 @@ Search free tiers sufficient at start.
 
 1. **Email identity:** which sending account? (e.g. hello@nexora domain vs Gmail)
 2. **Research PC schedule:** hours Gideon runs daily (machine must be on).
-3. **Hybrid API:** local-only to start, or add a small paid API budget for harder reasoning?
+3. **GPU purchase (later, optional):** a NVIDIA card with 12GB+ VRAM unlocks v2 brain
+   training — until then the CPU path runs v0/v1 slowly.
 4. **WhatsApp relay form:** push notification to owner's phone vs. copy-paste tray in dashboard.
-5. **Model choice:** benchmark 2–3 Ollama models on sales-writing quality before committing.
+5. **Brain v0 size:** confirm target parameters (1M vs 3M) against CPU training-time budget.
 
 ---
 
 ## 9. Honest Limits (kept visible on purpose)
 
-- Local models are weaker than cloud ones — hybrid mode available if a task needs it.
+- The brain starts infant-level (built from scratch, CPU-only for now) — Gideon's early
+  strength is rules, retrieval and statistics; fluent writing grows as training data and
+  GPU scale grow. No API payments, no downloaded models — ever.
 - It books qualified conversations; humans still close deals.
 - Learning happens within its design and evidence — it is a relentless specialist, not
   open-ended superintelligence.
@@ -234,4 +278,5 @@ Search free tiers sufficient at start.
 
 ---
 
-*Status: PLAN ONLY. No code written. Awaiting "go" to begin Phase 0 — weekend session 1.*
+*Status: Phase 0 COMPLETE (24/24 tests, dashboard built + serve smoke green, commit in git).
+Next: Phase 1 — The Brain v0 (own tokenizer + transformer, from scratch, CPU → GPU-ready).*

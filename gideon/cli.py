@@ -69,13 +69,11 @@ def cmd_doctor(_args: argparse.Namespace) -> int:
         else str(probe.get("error", "")),
     )
 
-    from gideon.llm import ollama_status
-
-    ollama = ollama_status()
+    brain_dir = settings.data_dir / "brain"
+    has_brain = brain_dir.exists() and any(brain_dir.glob("*.pt"))
     all_ok &= _check(
-        "ollama (Phase 1)", bool(ollama.get("ok")),
-        f"{len(ollama.get('models', []))} models" if ollama.get("ok")
-        else "not running — install from https://ollama.com",
+        "brain (Phase 1)", has_brain,
+        "checkpoint found" if has_brain else "not trained yet — Phase 1 builds it",
         warn=True,
     )
 

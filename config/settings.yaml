@@ -32,7 +32,12 @@ voice:                       # Phase 9
   stt: whisper
   tts: piper
 
-llm:
-  provider: ollama           # ollama | api (hybrid, later)
-  model: null                # chosen in Phase 1 (benchmark)
-  base_url: http://127.0.0.1:11434
+brain:                        # Phase 1: Gideon's OWN brain — built from scratch
+  provider: gideon            # no external AI, no APIs, no downloaded weights
+  device: cpu                 # → cuda the moment a GPU is installed
+  checkpoint_dir: data/brain  # our weights, our disk
+  corpus_dir: data/corpus     # training text we gather ourselves
+  v0:
+    params_target: 3000000    # ~3M fits 6 GB RAM (open decision #5)
+    context_length: 128
+    batch_size: 8
