@@ -73,6 +73,22 @@ def _connect(db_path: Path) -> sqlite3.Connection:
     return conn
 
 
+def _ensure_schema(conn: sqlite3.Connection) -> None:
+    """Self-heal: apply migrations on first connection (fresh checkout safe)."""
+    row = conn.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='schema_migrations'"
+    ).fetchone()
+    if row is not None:
+        return
+    for version, sql in MIGRATIONS:
+        conn.executescript(sql)
+        conn.execute(
+            "INSERT INTO schema_migrations(version, applied_at) VALUES(?, ?)",
+            (version, _now()),
+        )
+    conn.commit()
+
+
 def get_connection() -> sqlite3.Connection:
     """Thread-local connection to the configured database."""
     conn = getattr(_local, "conn", None)
@@ -81,6 +97,7 @@ def get_connection() -> sqlite3.Connection:
         if conn is not None:
             conn.close()
         conn = _connect(db_path)
+        _ensure_schema(conn)
         _local.conn = conn
         _local.db_path = db_path
     return conn

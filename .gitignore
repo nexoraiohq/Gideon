@@ -14,6 +14,11 @@ data/*
 # Local env overrides
 .env
 
+# Frontend (React + TypeScript, Vite)
+web/node_modules/
+web/dist/
+web/*.tsbuildinfo
+
 # Editors / OS
 .vscode/
 .DS_Store

@@ -1,0 +1,38 @@
+# Gideon settings — versioned in git. Runtime memory lives in data/.
+# Override data location with env GIDEON_DATA_DIR.
+
+paths:
+  data_dir: data            # relative to project root (or absolute)
+
+dashboard:
+  host: 127.0.0.1
+  port: 8420
+
+schedule:                    # Phase 3: autonomous research rhythm
+  morning_briefing: "07:00"  # deep research sweep + briefing
+  evening_report: "18:00"    # what it did, found, recommends
+  background_scan_minutes: 30
+
+research:
+  max_pages_per_target: 30
+  request_delay_seconds: 1.5
+  respect_robots: true
+
+outreach:                    # Phase 5: hard safety caps
+  email_max_per_day: 20
+  whatsapp_relay: true       # Gideon drafts → owner sends
+  require_approval_weeks: 2  # autonomy ladder step 1 length
+
+autonomy:
+  level: approve_first       # approve_first | earned | full (owner controls)
+  email_auto_send: false     # flips on only after trust period
+
+voice:                       # Phase 9
+  wake_word: "hey gideon"
+  stt: whisper
+  tts: piper
+
+llm:
+  provider: ollama           # ollama | api (hybrid, later)
+  model: null                # chosen in Phase 1 (benchmark)
+  base_url: http://127.0.0.1:11434

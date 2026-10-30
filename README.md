@@ -20,10 +20,18 @@ python -m gideon.cli init
 # 3. Health check (everything should be PASS)
 python -m gideon.cli doctor
 
-# 4. Run the dashboard
+# 4. Frontend (React + TypeScript) — first time only
+cd web
+npm install
+npm run build        # production build → web/dist (served by FastAPI)
+#   or for development with hot reload:
+npm run dev          # http://127.0.0.1:5173 (API proxied to :8420)
+
+# 5. Run the dashboard
+cd ..
 python -m gideon.cli serve   # then open http://127.0.0.1:8420
 
-# 5. Run the test suite (the "nothing breaks" gate)
+# 6. Run the test suite (the "nothing breaks" gate)
 pytest
 ```
 
@@ -50,7 +58,10 @@ Gideon/
 │   ├── inbox/            # items awaiting owner approval
 │   ├── logs/             # append-only logs
 │   └── backups/          # database backups
-├── web/                  # dashboard frontend (served by app.py)
+├── web/                  # React + TypeScript dashboard (Vite)
+│   ├── src/              # typed components, API client, types
+│   ├── dist/             # production build (git-ignored) — served by FastAPI
+│   └── index.html        # Vite entry shell
 ├── tests/                # pytest — must pass before any change ships
 ├── docs/                 # architecture & decisions
 └── GIDEON_BUILD_PLAN.md  # the master plan
@@ -78,4 +89,6 @@ Gideon/
 | `python -m gideon.cli init` | Create data folders + initialize database |
 | `python -m gideon.cli doctor` | Health check: env, storage, config, LLM, git |
 | `python -m gideon.cli serve` | Run the dashboard (http://127.0.0.1:8420) |
+| `cd web && npm run dev` | Frontend dev server with hot reload (:5173) |
+| `cd web && npm run build` | Type-check + build React app to `web/dist` |
 | `pytest` | Run the full test suite |

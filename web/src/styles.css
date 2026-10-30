@@ -1,0 +1,100 @@
+:root {
+  color-scheme: dark;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #05070d;
+  color: #d7e3ff;
+  min-height: 100vh;
+}
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 20px;
+  min-height: 100vh;
+}
+
+.badge {
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #4fd1ff;
+  border: 1px solid #1d3a55;
+  border-radius: 999px;
+  padding: 6px 16px;
+  margin-bottom: 24px;
+}
+
+h1 {
+  font-size: 42px;
+  font-weight: 300;
+  letter-spacing: 10px;
+  color: #eaf4ff;
+}
+
+.tagline {
+  margin-top: 8px;
+  color: #6f86ad;
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+
+.grid {
+  margin-top: 48px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  width: 100%;
+  max-width: 980px;
+}
+
+.card {
+  background: #0a1020;
+  border: 1px solid #16233d;
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+.card-k {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #5f77a0;
+}
+
+.card-v {
+  margin-top: 8px;
+  font-size: 15px;
+  color: #cfe3ff;
+  word-break: break-all;
+}
+
+.ok { color: #58e08c; }
+.warn { color: #ffc46b; }
+.bad { color: #ff7a7a; }
+
+.status {
+  margin-top: 32px;
+  font-size: 13px;
+  color: #6f86ad;
+  text-align: center;
+  line-height: 1.8;
+  word-break: break-all;
+}
+
+.footer {
+  margin-top: 48px;
+  font-size: 11px;
+  color: #3d4f6d;
+  letter-spacing: 2px;
+  text-align: center;
+}
