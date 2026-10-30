@@ -1,0 +1,9 @@
+[project]
+name = "gideon"
+version = "0.1.0"
+description = "GIDEON — Nexora Growth Agent (AI chief of staff)"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

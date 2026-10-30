@@ -1,0 +1,20 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+
+# Runtime data (memory, logs, databases — never committed)
+data/*
+!data/.gitkeep
+!data/**/
+!data/**/.gitkeep
+
+# Local env overrides
+.env
+
+# Editors / OS
+.vscode/
+.DS_Store
+Thumbs.db
