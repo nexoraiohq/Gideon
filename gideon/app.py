@@ -19,7 +19,9 @@ from fastapi.staticfiles import StaticFiles
 
 from gideon import __version__
 from gideon.config import WEB_DIR, get_settings
-from gideon.core import constitution
+from gideon.core import constitution, guardrail
+from gideon.knowledge import answer as knowledge_answer
+from gideon.knowledge import store as knowledge_store
 from gideon.llm import ollama_status
 from gideon.memory import db
 
@@ -57,6 +59,54 @@ def events(limit: int = 20, kind: str | None = None) -> JSONResponse:
 @app.get("/api/screens")
 def screens(limit: int = 50) -> JSONResponse:
     return JSONResponse(db.list_screens(limit=limit))
+
+
+# ---------------------------------------------------------------------------
+# Phase 2 — Identity: knowledge, cited answers, promise guardrail
+# ---------------------------------------------------------------------------
+from pydantic import BaseModel  # noqa: E402
+
+
+class Question(BaseModel):
+    question: str
+
+
+class DraftText(BaseModel):
+    text: str
+
+
+@app.post("/api/ask")
+def ask(body: Question) -> JSONResponse:
+    """Answer from approved knowledge — always with citations."""
+    try:
+        return JSONResponse(knowledge_answer.answer(body.question))
+    except ValueError as exc:
+        return JSONResponse({"detail": str(exc)}, status_code=400)
+
+
+@app.get("/api/facts")
+def facts(approved: bool | None = None, limit: int = 100) -> JSONResponse:
+    items = knowledge_store.list_facts(approved=approved, limit=limit)
+    return JSONResponse(
+        {"items": items,
+         "total": knowledge_store.count_facts(approved=approved),
+         "pending": knowledge_store.count_facts(approved=False)}
+    )
+
+
+@app.post("/api/facts/{fact_id}/approve")
+def approve(fact_id: int) -> JSONResponse:
+    ok = knowledge_store.approve_fact(fact_id)
+    if not ok:
+        return JSONResponse({"detail": "fact not found or already approved"},
+                            status_code=404)
+    return JSONResponse({"approved": True, "fact_id": fact_id})
+
+
+@app.post("/api/check")
+def check(body: DraftText) -> JSONResponse:
+    """Promise guardrail: judge a draft against the Delivery Ledger."""
+    return JSONResponse(guardrail.check_draft(body.text).to_dict())
 
 
 @app.get("/")
