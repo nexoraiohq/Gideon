@@ -41,3 +41,9 @@ brain:                        # Phase 1: Gideon's OWN brain — built from scrat
     params_target: 3000000    # ~3M fits 6 GB RAM (open decision #5)
     context_length: 128
     batch_size: 8
+
+hunger:                       # always hungry for knowledge (owner trait)
+  min_items_per_day: 5        # Gideon reports being hungry below these floors
+  min_chars_per_day: 8000
+  retrain_after_new_chars: 20000  # brain "eats again" (continued training) after N new chars
+  brief_on_hunger: true       # hunger status appears in morning briefing

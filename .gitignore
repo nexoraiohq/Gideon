@@ -6,10 +6,12 @@ __pycache__/
 *.egg-info/
 
 # Runtime data (memory, logs, databases — never committed)
-data/*
-!data/.gitkeep
+data/**
 !data/**/
 !data/**/.gitkeep
+# Exception: the curriculum is authored, tiny, and rebuild-critical → versioned
+!data/corpus/
+!data/corpus/*.txt
 
 # Local env overrides
 .env

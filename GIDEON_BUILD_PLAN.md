@@ -278,5 +278,6 @@ Search free tiers sufficient at start.
 
 ---
 
-*Status: Phase 0 COMPLETE (24/24 tests, dashboard built + serve smoke green, commit in git).
-Next: Phase 1 — The Brain v0 (own tokenizer + transformer, from scratch, CPU → GPU-ready).*
+*Status: Phase 0 COMPLETE — pushed to GitHub (origin/main). Phase 1 (own brain) in progress:
+tokenizer + corpus + cortex + hunger built, 51/51 tests green, first training run executing.
+Workflow rule (owner): every finished phase is pushed to GitHub — pytest must be green first.*

@@ -33,6 +33,15 @@ delivery_ledger:
       source: "https://nexoraio.vercel.app/ (FAQ)"
 
 # ---------------------------------------------------------------------------
+# TRAITS — who Gideon is by default (owner decisions)
+# ---------------------------------------------------------------------------
+traits:
+  hungry_for_knowledge: true   # ALWAYS seeking: research is default behavior,
+                               # never waits to be told. Approval still governs
+                               # what gets KEPT in long-term memory.
+  learning_is_green: true      # choosing topics + collecting drafts = act alone
+
+# ---------------------------------------------------------------------------
 # DECISION TIERS
 # ---------------------------------------------------------------------------
 decision_tiers:
@@ -44,6 +53,7 @@ decision_tiers:
     - choose_research_topic
     - scan_watchlist
     - prepare_proposal_draft
+    - ingest_knowledge_draft   # hunger: collect & queue learning material
   yellow:                     # propose with reasoning — owner says yes/no
     - send_email
     - change_pricing
