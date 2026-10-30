@@ -205,8 +205,10 @@ Search free tiers sufficient at start.
       scratch on CPU, `device: cpu|cuda` switch built in. **COMPLETE — 1.97M params born from
       random init, loss 6.14 → 1.90 in 250 steps on the Nexora curriculum; 57/57 tests; pushed
       to GitHub (`86e9583`).** Newborn's first words logged; checkpoints in `data/brain/`.
-- [ ] **Phase 2 — Identity:** learn Nexora (site ingested), build Delivery Ledger, constitution
-      (decision tiers, guardrails) encoded. *Test: ask it about Nexora → accurate, cited answers.*
+- [x] **Phase 2 — Identity:** learn Nexora (site ingested), build Delivery Ledger, constitution
+      (decision tiers, guardrails) encoded. **COMPLETE — 177 facts ingested from
+      nexoraio.vercel.app with sources + approval gate; cited answers API (/api/ask);
+      promise guardrail green/yellow/red (/api/check); 83/83 tests; pushed (`47a78e5`).**
 - [ ] **Phase 3 — Learning:** target-driven learning loop with approval UI. *Test: give it a
       competitor URL → structured facts → approve → stored with source.*
 - [ ] **Phase 4 — Research engine:** morning sweep + watch list + opportunity detector +
@@ -280,6 +282,6 @@ Search free tiers sufficient at start.
 
 ---
 
-*Status: Phase 1 COMPLETE — brain v0 trained (loss 6.14→1.90), 57/57 tests, pushed to GitHub.
-Next: Phase 2 — Identity (learn Nexora, Delivery Ledger wiring) on the next weekend session.
-Workflow rule (owner): pytest green → commit → push every finished phase.*
+*Status: Phase 2 COMPLETE — 177 Nexora facts learned (approval gate enforced), cited answers,
+promise guardrail live, 83/83 tests, pushed to GitHub. Next: Phase 3 — Learning loop
+(targeted research + approval UI). Workflow rule: pytest green → commit → push.*
