@@ -19,6 +19,10 @@ web/node_modules/
 web/dist/
 web/*.tsbuildinfo
 
+# Stray runtime files
+serve.log
+serve.err
+
 # Editors / OS
 .vscode/
 .DS_Store
