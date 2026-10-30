@@ -201,8 +201,10 @@ Search free tiers sufficient at start.
 
 - [x] **Phase 0 — Foundation:** project structure, storage layout, constitution, test suite,
       git safety net, React+TS dashboard. **COMPLETE — 24/24 tests, build + serve smoke green.**
-- [ ] **Phase 1 — The Brain v0:** our own tokenizer + decoder-only transformer trained from
-      scratch on CPU, `device: cpu|cuda` switch built in. *Test: it trains and generates text.*
+- [x] **Phase 1 — The Brain v0:** our own tokenizer + decoder-only transformer trained from
+      scratch on CPU, `device: cpu|cuda` switch built in. **COMPLETE — 1.97M params born from
+      random init, loss 6.14 → 1.90 in 250 steps on the Nexora curriculum; 57/57 tests; pushed
+      to GitHub (`86e9583`).** Newborn's first words logged; checkpoints in `data/brain/`.
 - [ ] **Phase 2 — Identity:** learn Nexora (site ingested), build Delivery Ledger, constitution
       (decision tiers, guardrails) encoded. *Test: ask it about Nexora → accurate, cited answers.*
 - [ ] **Phase 3 — Learning:** target-driven learning loop with approval UI. *Test: give it a
@@ -278,6 +280,6 @@ Search free tiers sufficient at start.
 
 ---
 
-*Status: Phase 0 COMPLETE — pushed to GitHub (origin/main). Phase 1 (own brain) in progress:
-tokenizer + corpus + cortex + hunger built, 51/51 tests green, first training run executing.
-Workflow rule (owner): every finished phase is pushed to GitHub — pytest must be green first.*
+*Status: Phase 1 COMPLETE — brain v0 trained (loss 6.14→1.90), 57/57 tests, pushed to GitHub.
+Next: Phase 2 — Identity (learn Nexora, Delivery Ledger wiring) on the next weekend session.
+Workflow rule (owner): pytest green → commit → push every finished phase.*
