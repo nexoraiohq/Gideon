@@ -214,8 +214,12 @@ Search free tiers sufficient at start.
       unapproved, approval queue API + dashboard panel, hunger reporting; live smoke: 134
       new facts from a real site study; 96/96 tests; pushed (`d55008e`).**
       *Test passed: URL → structured facts → approve → stored with source.*
-- [ ] **Phase 4 — Research engine:** morning sweep + watch list + opportunity detector +
-      first morning briefing. *Test: wake up to a real briefing.*
+- [x] **Phase 4 — Research engine:** morning sweep + watch list + opportunity detector +
+      first morning briefing. **COMPLETE — `gideon sweep` CLI + /api/sweep, watch list
+      (migration 3), 4 evidence-citing detectors (weak digital / missing booking /
+      competitor move / local signal), CEO briefing on dashboard + /api/briefing; live run
+      on real site; 115/115 tests; pushed (`bb7f68e`).**
+      *Test passed: real sweep + briefing generated from live data.*
 - [ ] **Phase 5 — Prospecting:** lead finder + scoring + pipeline/CRM. *Test: 10 real qualified
       prospects with reasons.*
 - [ ] **Phase 6 — Outreach:** drafts + promise guardrail + approval flow + email sending +
@@ -285,6 +289,7 @@ Search free tiers sufficient at start.
 
 ---
 
-*Status: Phase 3 COMPLETE — learning loop live (targets → study → approval queue → memory),
-96/96 tests, dashboard UI with approval panel, pushed to GitHub. Next: Phase 4 — Research
-engine (morning sweep + watch list + first briefing). Workflow: pytest green → commit → push.*
+*Status: Phase 4 COMPLETE — research engine live (sweep/watch list/opportunities/CEO
+briefing), 115/115 tests, pushed to GitHub. Next: Phase 5 — Prospecting (lead finder +
+scoring + pipeline). To schedule daily sweeps on Windows: Task Scheduler →
+`python -m gideon.cli sweep`. Workflow: pytest green → commit → push.*
