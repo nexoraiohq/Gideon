@@ -1,5 +1,6 @@
 import type {
   ApprovalsResponse,
+  Briefing,
   EventItem,
   Health,
   ScreenItem,
@@ -39,6 +40,13 @@ export const api = {
     ),
   pauseTarget: (id: number) =>
     postJson<{ paused: boolean }>(`/api/targets/${id}/pause`),
+  resumeTarget: (id: number) =>
+    postJson<{ resumed: boolean }>(`/api/targets/${id}/resume`),
   approveFact: (id: number) =>
     postJson<{ approved: boolean }>(`/api/facts/${id}/approve`),
+  briefing: (hours = 24) => getJson<Briefing>(`/api/briefing?hours=${hours}`),
+  runSweep: () =>
+    postJson<{ targets_total: number; facts_learned: number; failed: unknown[] }>(
+      '/api/sweep'
+    ),
 }

@@ -19,7 +19,7 @@ def isolated_db(tmp_path, monkeypatch):
 
 def test_init_db_applies_migrations():
     applied = db.init_db()
-    assert applied == [1, 2]
+    assert applied == [1, 2, 3]
     # second run is a no-op (idempotent — nothing breaks on restart)
     assert db.init_db() == []
 
@@ -42,17 +42,23 @@ def test_existing_db_gets_new_migrations():
         conn.close()
 
         conn = db._connect(old_path)
-        db._ensure_schema(conn)
-        tables = {
-            row["name"]
-            for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
-        }
-        assert "targets" in tables  # migration 2 landed
-        versions = [
-            r["version"] for r in conn.execute("SELECT version FROM schema_migrations")
-        ]
-        assert sorted(versions) == [1, 2]
-        conn.close()
+        try:
+            db._ensure_schema(conn)
+            tables = {
+                row["name"]
+                for row in conn.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table'"
+                )
+            }
+            versions = [
+                r["version"]
+                for r in conn.execute("SELECT version FROM schema_migrations")
+            ]
+        finally:
+            conn.close()
+        assert "targets" in tables   # migration 2 landed
+        assert "watchlist" in tables  # migration 3 landed
+        assert sorted(versions) == [1, 2, 3]
 
 
 def test_events_append_and_read():

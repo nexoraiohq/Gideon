@@ -116,6 +116,30 @@ def cmd_serve(_args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_sweep(_args: argparse.Namespace) -> int:
+    """One research pass over all active targets (called by the OS scheduler)."""
+    from gideon.research import sweep as research_sweep
+
+    db.init_db()
+    report = research_sweep.sweep()
+    ok = report["targets_total"] - len(report["failed"])
+    print(f"✓ swept {ok}/{report['targets_total']} targets")
+    print(f"✓ new facts: {report['facts_learned']} (pending total: {report['facts_pending']})")
+    for f in report["failed"]:
+        print(f"! {f['name']}: {f['error']}")
+    return 0 if not report["failed"] else 1
+
+
+def cmd_briefing(_args: argparse.Namespace) -> int:
+    """Print the morning briefing (stdout — readable by a person or a cron job)."""
+    from gideon.research import briefing as research_briefing
+
+    db.init_db()
+    report = research_briefing.build_briefing(hours=_args.hours)
+    print(report["text"])
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     # Windows consoles default to cp1252 which can't print ✓/✗/→ — force UTF-8
     for stream in (sys.stdout, sys.stderr):
@@ -136,6 +160,15 @@ def main(argv: list[str] | None = None) -> int:
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8420)
     serve.set_defaults(func=cmd_serve)
+
+    sub.add_parser("sweep", help="one research pass over all active targets").set_defaults(
+        func=cmd_sweep
+    )
+
+    briefing = sub.add_parser("briefing", help="print the morning briefing")
+    briefing.add_argument("--hours", type=int, default=24,
+                          help="look-back window in hours (default 24)")
+    briefing.set_defaults(func=cmd_briefing)
 
     args = parser.parse_args(argv)
     return int(args.func(args))

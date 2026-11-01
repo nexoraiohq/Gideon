@@ -78,6 +78,19 @@ MIGRATIONS: list[tuple[int, str]] = [
         CREATE INDEX IF NOT EXISTS idx_targets_active ON targets(active);
         """,
     ),
+    (
+        3,
+        """
+        -- Watch list: subjects/terms Gideon watches across everything it studies
+        CREATE TABLE IF NOT EXISTS watchlist (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            term       TEXT NOT NULL,
+            note       TEXT NOT NULL DEFAULT '',
+            active     INTEGER NOT NULL DEFAULT 1,
+            created_at TEXT NOT NULL
+        );
+        """,
+    ),
 ]
 
 

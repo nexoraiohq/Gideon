@@ -70,6 +70,16 @@ def pause_target(target_id: int) -> bool:
     return bool(cur.rowcount)
 
 
+def resume_target(target_id: int) -> bool:
+    conn = db.get_connection()
+    cur = conn.execute("UPDATE targets SET active = 1 WHERE id = ?", (target_id,))
+    conn.commit()
+    if cur.rowcount:
+        db.record_event("target_resumed", f"resumed target #{target_id}",
+                        {"target_id": target_id})
+    return bool(cur.rowcount)
+
+
 def mark_researched(target_id: int) -> None:
     conn = db.get_connection()
     conn.execute("UPDATE targets SET last_researched = ? WHERE id = ?", (_now(), target_id))

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from './api'
-import type { EventItem, Fact, Health, ScreenItem, Target } from './types'
+import type { Briefing, EventItem, Fact, Health, ScreenItem, Target } from './types'
 
 type LoadState<T> = { data: T | null; error: string | null }
 
@@ -37,6 +37,91 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 
 const ok = (v: boolean) => (v ? 'ok' : 'bad')
 const warn = (v: boolean) => (v ? 'ok' : 'warn')
+
+function MorningBriefing() {
+  const [brief, setBrief] = useState<Briefing | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [sweeping, setSweeping] = useState(false)
+  const [sweepMsg, setSweepMsg] = useState<string | null>(null)
+
+  const refresh = useCallback(async () => {
+    try {
+      setBrief(await api.briefing())
+      setError(null)
+    } catch (err) {
+      setError(String(err))
+    }
+  }, [])
+
+  useEffect(() => {
+    refresh()
+  }, [refresh])
+
+  const runSweep = async () => {
+    setSweeping(true)
+    setSweepMsg(null)
+    try {
+      const r = await api.runSweep()
+      setSweepMsg(
+        `swept ${r.targets_total} targets → ${r.facts_learned} new facts to review`
+      )
+      await refresh()
+    } catch (err) {
+      setSweepMsg(String(err))
+    } finally {
+      setSweeping(false)
+    }
+  }
+
+  const s = brief?.summary
+
+  return (
+    <section className="card wide">
+      <div className="card-k">Morning briefing</div>
+      <div className="card-v">
+        {error && <p className="bad">{error}</p>}
+        {!brief && !error && <p className="muted">loading…</p>}
+        {brief && s && (
+          <>
+            <p className="brief-date">{brief.date}</p>
+            <div className="brief-stats">
+              <span>studied <b>{s.targets_studied}</b></span>
+              <span>learned <b>{s.facts_learned}</b></span>
+              <span>awaiting you <b>{s.facts_pending}</b></span>
+              <span>opportunities <b>{s.opportunities}</b></span>
+              {s.failures > 0 && <span className="bad">failed {s.failures}</span>}
+            </div>
+
+            {brief.opportunities.length > 0 && (
+              <div className="opps">
+                {brief.opportunities.slice(0, 5).map((op, i) => (
+                  <div key={i} className="opp-row">
+                    <span className={`opp-kind ${op.kind}`}>{op.kind}</span>
+                    <div>
+                      <div className="opp-title">{op.title}</div>
+                      <div className="muted">{op.why}</div>
+                      <div className="opp-action">next: {op.suggested_action}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="brief-actions">
+              <button disabled={sweeping} onClick={runSweep}>
+                {sweeping ? 'sweeping…' : 'run sweep now'}
+              </button>
+              <button className="ghost" onClick={refresh}>
+                refresh briefing
+              </button>
+              {sweepMsg && <span className="notice">{sweepMsg}</span>}
+            </div>
+          </>
+        )}
+      </div>
+    </section>
+  )
+}
 
 function LearningLoop() {
   const [targets, setTargets] = useState<Target[]>([])
@@ -91,37 +176,49 @@ function LearningLoop() {
 
         <div className="targets">
           {targets.map((t) => (
-            <div key={t.id} className="target-row">
+            <div key={t.id} className={`target-row ${t.active ? '' : 'paused'}`}>
               <span className="target-name">
                 [{t.kind}] {t.name}
+                {!t.active && <span className="paused-tag"> paused</span>}
               </span>
               <span className="target-meta">
                 {t.last_researched
                   ? `studied ${t.last_researched.slice(0, 10)}`
                   : 'not yet studied'}
               </span>
-              <button
-                disabled={busy === t.id}
-                onClick={() =>
-                  act(t.id, async () => {
-                    const r = await api.research(t.id)
-                    setNotice(
-                      r.ok
-                        ? `studied ${t.name}: ${r.added.length} new facts to review`
-                        : `study failed: ${r.error}`
-                    )
-                  })
-                }
-              >
-                {busy === t.id ? 'studying…' : 'study now'}
-              </button>
-              <button
-                className="ghost"
-                disabled={busy === t.id}
-                onClick={() => act(t.id, () => api.pauseTarget(t.id).then(() => {}))}
-              >
-                pause
-              </button>
+              {t.active ? (
+                <>
+                  <button
+                    disabled={busy === t.id}
+                    onClick={() =>
+                      act(t.id, async () => {
+                        const r = await api.research(t.id)
+                        setNotice(
+                          r.ok
+                            ? `studied ${t.name}: ${r.added.length} new facts to review`
+                            : `study failed: ${r.error}`
+                        )
+                      })
+                    }
+                  >
+                    {busy === t.id ? 'studying…' : 'study now'}
+                  </button>
+                  <button
+                    className="ghost"
+                    disabled={busy === t.id}
+                    onClick={() => act(t.id, () => api.pauseTarget(t.id).then(() => {}))}
+                  >
+                    pause
+                  </button>
+                </>
+              ) : (
+                <button
+                  disabled={busy === t.id}
+                  onClick={() => act(t.id, () => api.resumeTarget(t.id).then(() => {}))}
+                >
+                  resume
+                </button>
+              )}
             </div>
           ))}
           {targets.length === 0 && <p className="muted">No targets yet — add one below.</p>}
@@ -252,6 +349,7 @@ export default function App() {
         </Card>
       </div>
 
+      <MorningBriefing />
       <LearningLoop />
 
       <p className="status">

@@ -88,3 +88,29 @@ export interface ApprovalsResponse {
   items: Fact[]
   pending: number
 }
+
+export interface Opportunity {
+  kind: string
+  title: string
+  why: string
+  evidence: { fact_id: number; source_url: string | null }[]
+  suggested_action: string
+  evidence_count: number
+}
+
+export interface Briefing {
+  date: string
+  hours: number
+  summary: {
+    sweeps: number
+    targets_studied: number
+    facts_learned: number
+    facts_pending: number
+    facts_approved_recent: number
+    failures: number
+    opportunities: number
+  }
+  opportunities: Opportunity[]
+  hunger: HungerStatus
+  text: string
+}

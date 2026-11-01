@@ -55,6 +55,16 @@ def test_pause_target():
     assert targets.pause_target(999) is False
 
 
+def test_resume_target():
+    tid = targets.add_target("Prospect C", "https://c.test", "prospect")
+    targets.pause_target(tid)
+    assert targets.resume_target(tid) is True
+    assert len(targets.list_targets(active_only=True)) == 1
+    assert targets.resume_target(999) is False
+    kinds = [e["kind"] for e in db.recent_events(limit=20)]
+    assert "target_paused" in kinds and "target_resumed" in kinds
+
+
 # ---------------------------------------------------------------------------
 # Research loop (fetch mocked — tests never touch the network)
 # ---------------------------------------------------------------------------

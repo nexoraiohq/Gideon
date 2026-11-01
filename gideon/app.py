@@ -24,6 +24,10 @@ from gideon.knowledge import answer as knowledge_answer
 from gideon.knowledge import store as knowledge_store
 from gideon.knowledge import targets as knowledge_targets
 from gideon.llm import ollama_status
+from gideon.research import briefing as research_briefing
+from gideon.research import opportunities as research_opportunities
+from gideon.research import sweep as research_sweep
+from gideon.research import watchlist as research_watchlist
 from gideon.memory import db
 
 app = FastAPI(title="Gideon", version=__version__)
@@ -122,7 +126,8 @@ class TargetIn(BaseModel):
 
 @app.get("/api/targets")
 def targets_list() -> JSONResponse:
-    items = knowledge_targets.list_targets()
+    # All targets (paused included) so the dashboard can offer resume
+    items = knowledge_targets.list_targets(active_only=False)
     return JSONResponse({"items": items, "hunger": knowledge_targets.hunger_report()})
 
 
@@ -151,10 +156,63 @@ def targets_pause(target_id: int) -> JSONResponse:
     return JSONResponse({"paused": True, "target_id": target_id})
 
 
+@app.post("/api/targets/{target_id}/resume")
+def targets_resume(target_id: int) -> JSONResponse:
+    if not knowledge_targets.resume_target(target_id):
+        return JSONResponse({"detail": "target not found"}, status_code=404)
+    return JSONResponse({"resumed": True, "target_id": target_id})
+
+
 @app.get("/api/approvals")
 def approvals(limit: int = 100) -> JSONResponse:
     queue = knowledge_targets.approval_queue(limit=limit)
     return JSONResponse({"items": queue, "pending": len(queue)})
+
+
+# ---------------------------------------------------------------------------
+# Phase 4 — Research engine: sweep, watch list, opportunities, briefing
+# ---------------------------------------------------------------------------
+class WatchIn(BaseModel):
+    term: str
+    note: str = ""
+
+
+@app.post("/api/sweep")
+def run_sweep() -> JSONResponse:
+    """One research pass over all active targets (the scheduler calls this)."""
+    return JSONResponse(research_sweep.sweep())
+
+
+@app.get("/api/briefing")
+def briefing(hours: int = 24) -> JSONResponse:
+    return JSONResponse(research_briefing.build_briefing(hours=hours))
+
+
+@app.get("/api/opportunities")
+def opportunities(limit: int = 20) -> JSONResponse:
+    items = research_opportunities.detect_opportunities()[:limit]
+    return JSONResponse({"items": items, "total": len(items)})
+
+
+@app.get("/api/watchlist")
+def watchlist_get() -> JSONResponse:
+    return JSONResponse({"items": research_watchlist.list_watch()})
+
+
+@app.post("/api/watchlist")
+def watchlist_add(body: WatchIn) -> JSONResponse:
+    try:
+        wid = research_watchlist.add_watch(body.term, body.note)
+    except ValueError as exc:
+        return JSONResponse({"detail": str(exc)}, status_code=400)
+    return JSONResponse({"watch_id": wid}, status_code=201)
+
+
+@app.post("/api/watchlist/{watch_id}/remove")
+def watchlist_remove(watch_id: int) -> JSONResponse:
+    if not research_watchlist.remove_watch(watch_id):
+        return JSONResponse({"detail": "watch not found"}, status_code=404)
+    return JSONResponse({"removed": True, "watch_id": watch_id})
 
 
 @app.get("/")

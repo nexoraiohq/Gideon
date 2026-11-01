@@ -124,6 +124,17 @@ h1 {
   font-size: 13px;
 }
 
+.target-row.paused {
+  opacity: 0.55;
+}
+
+.paused-tag {
+  color: #ffc46b;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
 .target-name {
   flex: 1;
   color: #cfe3ff;
@@ -225,4 +236,66 @@ input {
   color: #5f77a0;
   font-size: 12px;
   margin-top: 6px;
+}
+
+/* ---- Phase 4: morning briefing ---- */
+.brief-date {
+  font-size: 13px;
+  color: #8fd3ff;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.brief-stats {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: #5f77a0;
+  margin-bottom: 14px;
+}
+
+.brief-stats b {
+  color: #cfe3ff;
+}
+
+.opps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.opp-row {
+  display: flex;
+  gap: 10px;
+  font-size: 13px;
+  border-left: 2px solid #1d3a55;
+  padding-left: 10px;
+}
+
+.opp-kind {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #ffc46b;
+  white-space: nowrap;
+  padding-top: 2px;
+}
+
+.opp-title {
+  color: #cfe3ff;
+}
+
+.opp-action {
+  color: #58e08c;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.brief-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
 }
