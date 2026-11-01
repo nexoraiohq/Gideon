@@ -299,3 +299,114 @@ input {
   align-items: center;
   flex-wrap: wrap;
 }
+
+/* ---- Phase 5: leads + pipeline ---- */
+.pipe-stats {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+
+.pipe-chip {
+  color: #5f77a0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.pipe-chip b {
+  color: #cfe3ff;
+}
+
+.pipe-chip.won b {
+  color: #58e08c;
+}
+
+.pipe-chip.lost b {
+  color: #ff7d7d;
+}
+
+.leads {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.lead-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 13px;
+  border-left: 2px solid #1d3a55;
+  padding-left: 10px;
+}
+
+.lead-row.stage-won {
+  border-left-color: #2e7d51;
+}
+
+.lead-row.stage-lost {
+  opacity: 0.5;
+  border-left-color: #6d3030;
+}
+
+.lead-grade {
+  font-weight: 700;
+  font-size: 14px;
+  width: 20px;
+  text-align: center;
+  padding-top: 1px;
+}
+
+.lead-grade.A {
+  color: #58e08c;
+}
+
+.lead-grade.B {
+  color: #8fd3ff;
+}
+
+.lead-grade.C {
+  color: #ffc46b;
+}
+
+.lead-grade.D {
+  color: #5f77a0;
+}
+
+.lead-main {
+  flex: 1;
+}
+
+.lead-name {
+  color: #cfe3ff;
+}
+
+.lead-loc {
+  color: #5f77a0;
+  font-size: 12px;
+}
+
+.lead-reasons {
+  margin: 4px 0 0;
+  padding-left: 16px;
+  color: #5f77a0;
+  font-size: 12px;
+}
+
+.lead-score {
+  font-size: 16px;
+  font-weight: 700;
+  color: #8fd3ff;
+  min-width: 28px;
+  text-align: right;
+}
+
+.lead-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}

@@ -91,6 +91,29 @@ MIGRATIONS: list[tuple[int, str]] = [
         );
         """,
     ),
+    (
+        4,
+        """
+        -- Leads: prospects Gideon found and scored (pipeline = tiny CRM)
+        CREATE TABLE IF NOT EXISTS leads (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            name       TEXT NOT NULL,
+            kind       TEXT NOT NULL DEFAULT 'business',
+            location   TEXT NOT NULL DEFAULT '',
+            url        TEXT,
+            contact    TEXT NOT NULL DEFAULT '',
+            source_url TEXT,
+            score      INTEGER NOT NULL DEFAULT 0,
+            reasons    TEXT NOT NULL DEFAULT '[]',
+            stage      TEXT NOT NULL DEFAULT 'new',
+            notes      TEXT NOT NULL DEFAULT '',
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_leads_stage ON leads(stage);
+        CREATE INDEX IF NOT EXISTS idx_leads_score ON leads(score);
+        """,
+    ),
 ]
 
 

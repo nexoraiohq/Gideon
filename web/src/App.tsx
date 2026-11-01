@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from './api'
-import type { Briefing, EventItem, Fact, Health, ScreenItem, Target } from './types'
+import type { Briefing, EventItem, Fact, Health, LeadsResponse, ScreenItem, Target } from './types'
+import { LEAD_STAGES } from './types'
 
 type LoadState<T> = { data: T | null; error: string | null }
 
@@ -118,6 +119,143 @@ function MorningBriefing() {
             </div>
           </>
         )}
+      </div>
+    </section>
+  )
+}
+
+function Leads() {
+  const [data, setData] = useState<LeadsResponse | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [notice, setNotice] = useState<string | null>(null)
+
+  const refresh = useCallback(async () => {
+    try {
+      setData(await api.leads())
+      setError(null)
+    } catch (err) {
+      setError(String(err))
+    }
+  }, [])
+
+  useEffect(() => {
+    refresh()
+  }, [refresh])
+
+  const runFinder = async () => {
+    setBusy(true)
+    setNotice(null)
+    try {
+      const r = await api.findLeads()
+      setNotice(
+        `scanned ${r.candidates} candidates → ${r.added.length} new leads ` +
+          `(${r.skipped_existing} already known, ${r.below_threshold} below score)`
+      )
+      await refresh()
+    } catch (err) {
+      setNotice(String(err))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const advance = async (id: number, stage: string) => {
+    setBusy(true)
+    try {
+      const r = await api.moveLeadStage(id, stage)
+      setNotice(r.detail)
+      await refresh()
+    } catch (err) {
+      setNotice(String(err))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const p = data?.pipeline
+  const nextStage: Record<string, string> = {
+    new: 'contacted',
+    contacted: 'replied',
+    replied: 'proposal',
+    proposal: 'won',
+  }
+
+  return (
+    <section className="card wide">
+      <div className="card-k">Leads — prospecting pipeline</div>
+      <div className="card-v">
+        {error && <p className="bad">{error}</p>}
+        {p && (
+          <div className="pipe-stats">
+            {LEAD_STAGES.map((s) => (
+              <span key={s} className={`pipe-chip ${s}`}>
+                {s} <b>{p.counts[s]}</b>
+              </span>
+            ))}
+            <span className="muted">
+              {p.total} total · win rate {p.win_rate}%
+            </span>
+          </div>
+        )}
+
+        {data && data.items.length > 0 && (
+          <div className="leads">
+            {data.items.slice(0, 12).map((l) => (
+              <div key={l.id} className={`lead-row stage-${l.stage}`}>
+                <span className={`lead-grade ${l.grade}`}>{l.grade}</span>
+                <div className="lead-main">
+                  <div className="lead-name">
+                    {l.name}
+                    <span className="lead-loc">
+                      {l.location && ` · ${l.location}`} · {l.stage}
+                    </span>
+                  </div>
+                  <ul className="lead-reasons">
+                    {l.reasons.slice(0, 3).map((r, i) => (
+                      <li key={i}>{r}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="lead-score">{l.score}</div>
+                <div className="lead-actions">
+                  {nextStage[l.stage] && (
+                    <button
+                      disabled={busy}
+                      onClick={() => advance(l.id, nextStage[l.stage])}
+                    >
+                      → {nextStage[l.stage]}
+                    </button>
+                  )}
+                  {l.stage !== 'lost' && l.stage !== 'won' && (
+                    <button
+                      className="ghost"
+                      disabled={busy}
+                      onClick={() => advance(l.id, 'lost')}
+                    >
+                      lost
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {data && data.items.length === 0 && (
+          <p className="muted">
+            No leads yet — run the finder to mine what Gideon knows.
+          </p>
+        )}
+
+        <div className="brief-actions">
+          <button disabled={busy} onClick={runFinder}>
+            {busy ? 'working…' : 'run lead finder'}
+          </button>
+          <button className="ghost" onClick={refresh}>
+            refresh
+          </button>
+          {notice && <span className="notice">{notice}</span>}
+        </div>
       </div>
     </section>
   )
@@ -350,6 +488,7 @@ export default function App() {
       </div>
 
       <MorningBriefing />
+      <Leads />
       <LearningLoop />
 
       <p className="status">

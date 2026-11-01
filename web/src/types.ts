@@ -114,3 +114,52 @@ export interface Briefing {
   hunger: HungerStatus
   text: string
 }
+
+export const LEAD_STAGES = [
+  'new',
+  'contacted',
+  'replied',
+  'proposal',
+  'won',
+  'lost',
+] as const
+
+export type LeadStage = (typeof LEAD_STAGES)[number]
+
+export interface Lead {
+  id: number
+  name: string
+  kind: string
+  location: string
+  url: string | null
+  contact: string
+  source_url: string | null
+  score: number
+  grade: string
+  reasons: string[]
+  stage: LeadStage
+  notes: string
+  created_at: string
+  updated_at: string
+}
+
+export interface PipelineReport {
+  counts: Record<LeadStage, number>
+  avg_scores: Record<string, number>
+  total: number
+  won: number
+  win_rate: number
+}
+
+export interface LeadsResponse {
+  items: Lead[]
+  total: number
+  pipeline: PipelineReport
+}
+
+export interface FindLeadsResponse {
+  candidates: number
+  added: { id: number; name: string; score: number; reasons: string[] }[]
+  skipped_existing: number
+  below_threshold: number
+}

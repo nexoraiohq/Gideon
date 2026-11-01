@@ -1,4 +1,4 @@
-"""Database tests — migrations, append-only events, screens, isolated data dir."""
+﻿"""Database tests â€” migrations, append-only events, screens, isolated data dir."""
 
 import pytest
 
@@ -19,8 +19,8 @@ def isolated_db(tmp_path, monkeypatch):
 
 def test_init_db_applies_migrations():
     applied = db.init_db()
-    assert applied == [1, 2, 3]
-    # second run is a no-op (idempotent — nothing breaks on restart)
+    assert applied == [1, 2, 3, 4]
+    # second run is a no-op (idempotent â€” nothing breaks on restart)
     assert db.init_db() == []
 
 
@@ -58,7 +58,7 @@ def test_existing_db_gets_new_migrations():
             conn.close()
         assert "targets" in tables   # migration 2 landed
         assert "watchlist" in tables  # migration 3 landed
-        assert sorted(versions) == [1, 2, 3]
+        assert sorted(versions) == [1, 2, 3, 4]
 
 
 def test_events_append_and_read():
@@ -91,3 +91,4 @@ def test_healthcheck_ok():
 def test_data_dir_outside_project_when_env_set(tmp_path):
     settings = get_settings()
     assert str(tmp_path) in str(settings.data_dir)
+

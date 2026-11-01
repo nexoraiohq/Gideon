@@ -220,8 +220,12 @@ Search free tiers sufficient at start.
       competitor move / local signal), CEO briefing on dashboard + /api/briefing; live run
       on real site; 115/115 tests; pushed (`bb7f68e`).**
       *Test passed: real sweep + briefing generated from live data.*
-- [ ] **Phase 5 — Prospecting:** lead finder + scoring + pipeline/CRM. *Test: 10 real qualified
-      prospects with reasons.*
+- [x] **Phase 5 — Prospecting:** lead finder + scoring + pipeline/CRM. **COMPLETE — 10 real
+      qualified Kisii prospects with cited reasons (5 A-grade score 90), migration 4 (leads),
+      explainable scoring (industry/local/digital gap/contact/intent), forward-only audited
+      pipeline (new→contacted→replied→proposal→won/lost), finder dedupes and excludes self +
+      existing clients (Delivery Ledger), dashboard Leads panel; 139/139 tests; pushed.**
+      *Test passed: acceptance run produced 10 sourced prospects; teleport (new→won) rejected.*
 - [ ] **Phase 6 — Outreach:** drafts + promise guardrail + approval flow + email sending +
       WhatsApp relay + follow-ups. *Test: first approved outreach goes out.*
 - [ ] **Phase 7 — CEO reports:** evening report + morning plan/strategy suggestions. *Test: full
@@ -289,7 +293,7 @@ Search free tiers sufficient at start.
 
 ---
 
-*Status: Phase 4 COMPLETE — research engine live (sweep/watch list/opportunities/CEO
-briefing), 115/115 tests, pushed to GitHub. Next: Phase 5 — Prospecting (lead finder +
-scoring + pipeline). To schedule daily sweeps on Windows: Task Scheduler →
-`python -m gideon.cli sweep`. Workflow: pytest green → commit → push.*
+*Status: Phase 5 COMPLETE — prospecting live (10 real sourced Kisii leads, explainable
+scoring, audited CRM pipeline), 139/139 tests, pushed to GitHub. Next: Phase 6 — Outreach
+(drafts + promise guardrail + approval flow). To schedule daily sweeps on Windows: Task
+Scheduler → `python -m gideon.cli sweep`. Workflow: pytest green → commit → push.*

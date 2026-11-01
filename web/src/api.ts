@@ -2,7 +2,9 @@ import type {
   ApprovalsResponse,
   Briefing,
   EventItem,
+  FindLeadsResponse,
   Health,
+  LeadsResponse,
   ScreenItem,
   TargetsResponse,
 } from './types'
@@ -48,5 +50,14 @@ export const api = {
   runSweep: () =>
     postJson<{ targets_total: number; facts_learned: number; failed: unknown[] }>(
       '/api/sweep'
+    ),
+  leads: (stage?: string) =>
+    getJson<LeadsResponse>(`/api/leads${stage ? `?stage=${stage}` : ''}`),
+  findLeads: (minScore = 30) =>
+    postJson<FindLeadsResponse>(`/api/leads/find?min_score=${minScore}`),
+  moveLeadStage: (id: number, stage: string, note = '') =>
+    postJson<{ stage: string; changed: boolean; detail: string }>(
+      `/api/leads/${id}/stage`,
+      { stage, note }
     ),
 }

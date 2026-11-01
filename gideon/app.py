@@ -28,6 +28,8 @@ from gideon.research import briefing as research_briefing
 from gideon.research import opportunities as research_opportunities
 from gideon.research import sweep as research_sweep
 from gideon.research import watchlist as research_watchlist
+from gideon.sales import leads as sales_leads
+from gideon.sales import pipeline as sales_pipeline
 from gideon.memory import db
 
 app = FastAPI(title="Gideon", version=__version__)
@@ -213,6 +215,65 @@ def watchlist_remove(watch_id: int) -> JSONResponse:
     if not research_watchlist.remove_watch(watch_id):
         return JSONResponse({"detail": "watch not found"}, status_code=404)
     return JSONResponse({"removed": True, "watch_id": watch_id})
+
+
+# ---------------------------------------------------------------------------
+# Phase 5 — Prospecting: lead finder, pipeline (tiny CRM)
+# ---------------------------------------------------------------------------
+class LeadIn(BaseModel):
+    name: str
+    kind: str = "business"
+    location: str = ""
+    url: str | None = None
+    contact: str = ""
+    notes: str = ""
+
+
+class StageIn(BaseModel):
+    stage: str
+    note: str = ""
+
+
+@app.get("/api/leads")
+def leads_list(stage: str | None = None, min_score: int = 0) -> JSONResponse:
+    items = sales_leads.list_leads(stage=stage, min_score=min_score)
+    return JSONResponse({"items": items, "total": len(items),
+                         "pipeline": sales_pipeline.pipeline_report()})
+
+
+@app.post("/api/leads/find")
+def leads_find(min_score: int = 30) -> JSONResponse:
+    """Mine the knowledge base for named businesses worth contacting."""
+    return JSONResponse(sales_leads.find_leads(min_score=min_score))
+
+
+@app.post("/api/leads")
+def leads_add(body: LeadIn) -> JSONResponse:
+    try:
+        lid = sales_leads.add_lead(
+            body.name, body.kind, body.location, body.url, body.contact,
+            notes=body.notes,
+        )
+    except ValueError as exc:
+        return JSONResponse({"detail": str(exc)}, status_code=400)
+    return JSONResponse(sales_leads.get_lead(lid), status_code=201)
+
+
+@app.get("/api/leads/{lead_id}")
+def lead_get(lead_id: int) -> JSONResponse:
+    lead = sales_leads.get_lead(lead_id)
+    if not lead:
+        return JSONResponse({"detail": "lead not found"}, status_code=404)
+    return JSONResponse(lead)
+
+
+@app.post("/api/leads/{lead_id}/stage")
+def lead_stage(lead_id: int, body: StageIn) -> JSONResponse:
+    try:
+        return JSONResponse(sales_pipeline.move_stage(lead_id, body.stage, body.note))
+    except ValueError as exc:
+        status = 404 if "not found" in str(exc) else 400
+        return JSONResponse({"detail": str(exc)}, status_code=status)
 
 
 @app.get("/")
