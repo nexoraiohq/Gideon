@@ -19,9 +19,40 @@ def isolated_db(tmp_path, monkeypatch):
 
 def test_init_db_applies_migrations():
     applied = db.init_db()
-    assert applied == [1]
+    assert applied == [1, 2]
     # second run is a no-op (idempotent — nothing breaks on restart)
     assert db.init_db() == []
+
+
+def test_existing_db_gets_new_migrations():
+    """Regression: an old DB (only migration 1) must gain migration 2 on next connect."""
+    import sqlite3
+    import tempfile
+    from pathlib import Path
+
+    with tempfile.TemporaryDirectory() as tmp:
+        old_path = Path(tmp) / "old.db"
+        # Forge a v1-era database: schema_migrations + migration-1 tables only
+        conn = sqlite3.connect(old_path)
+        conn.executescript(db.MIGRATIONS[0][1])
+        conn.execute(
+            "INSERT INTO schema_migrations(version, applied_at) VALUES(1, '2026-01-01')"
+        )
+        conn.commit()
+        conn.close()
+
+        conn = db._connect(old_path)
+        db._ensure_schema(conn)
+        tables = {
+            row["name"]
+            for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        }
+        assert "targets" in tables  # migration 2 landed
+        versions = [
+            r["version"] for r in conn.execute("SELECT version FROM schema_migrations")
+        ]
+        assert sorted(versions) == [1, 2]
+        conn.close()
 
 
 def test_events_append_and_read():

@@ -98,3 +98,131 @@ h1 {
   letter-spacing: 2px;
   text-align: center;
 }
+
+/* ---- Phase 3: learning loop ---- */
+.card.wide {
+  margin-top: 16px;
+  width: 100%;
+  max-width: 980px;
+}
+
+.hunger {
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.targets {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.target-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.target-name {
+  flex: 1;
+  color: #cfe3ff;
+}
+
+.target-meta {
+  color: #5f77a0;
+  font-size: 12px;
+}
+
+button {
+  background: #12213c;
+  color: #8fd3ff;
+  border: 1px solid #1d3a55;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  border-color: #4fd1ff;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+button.ghost {
+  background: transparent;
+  color: #5f77a0;
+}
+
+.add-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+input,
+select {
+  background: #060b16;
+  border: 1px solid #16233d;
+  color: #d7e3ff;
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 13px;
+}
+
+input {
+  flex: 1;
+  min-width: 160px;
+}
+
+.notice {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #ffc46b;
+}
+
+.queue {
+  margin-top: 18px;
+  border-top: 1px solid #16233d;
+  padding-top: 12px;
+}
+
+.queue-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #5f77a0;
+  margin-bottom: 10px;
+}
+
+.fact-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  padding: 6px 0;
+  border-bottom: 1px solid #0e1830;
+}
+
+.fact-text {
+  flex: 1;
+  word-break: break-word;
+}
+
+.fact-src {
+  color: #5f77a0;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.muted {
+  color: #5f77a0;
+  font-size: 12px;
+  margin-top: 6px;
+}

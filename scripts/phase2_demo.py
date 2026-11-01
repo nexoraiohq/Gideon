@@ -31,7 +31,7 @@ for q in (
 print("\n=== 3) PROMISE GUARDRAIL ON OUTBOUND DRAFTS ===")
 drafts = {
     "clean": "Hi Sarah, Nexora builds fast, mobile-first websites for salons in Kisii, "
-             "including booking flows and WhatsApp enquiries.",
+            "including booking flows and WhatsApp enquiries.",
     "unbacked": "Our websites will double your bookings in 30 days.",
     "red_line": "We guarantee first page rankings on Google, money back if not.",
 }

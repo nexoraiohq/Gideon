@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { api } from './api'
-import type { EventItem, Health, ScreenItem } from './types'
+import type { EventItem, Fact, Health, ScreenItem, Target } from './types'
 
 type LoadState<T> = { data: T | null; error: string | null }
 
@@ -37,6 +37,147 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 
 const ok = (v: boolean) => (v ? 'ok' : 'bad')
 const warn = (v: boolean) => (v ? 'ok' : 'warn')
+
+function LearningLoop() {
+  const [targets, setTargets] = useState<Target[]>([])
+  const [pending, setPending] = useState<Fact[]>([])
+  const [hungerMsg, setHungerMsg] = useState('')
+  const [busy, setBusy] = useState<number | 'new' | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
+  const [form, setForm] = useState({ name: '', url: '', kind: 'competitor' })
+
+  const refresh = useCallback(async () => {
+    try {
+      const [t, a] = await Promise.all([api.targets(), api.approvals()])
+      setTargets(t.items)
+      setPending(a.items)
+      setHungerMsg(t.hunger.hunger.message)
+    } catch (err) {
+      setNotice(String(err))
+    }
+  }, [])
+
+  useEffect(() => {
+    refresh()
+  }, [refresh])
+
+  const act = async (key: number | 'new', fn: () => Promise<void>) => {
+    setBusy(key)
+    setNotice(null)
+    try {
+      await fn()
+      await refresh()
+    } catch (err) {
+      setNotice(String(err))
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  const addTarget = () =>
+    act('new', async () => {
+      if (!form.name.trim() || !form.url.trim()) throw new Error('name and url required')
+      await api.addTarget(form)
+      setForm({ name: '', url: '', kind: 'competitor' })
+    })
+
+  return (
+    <section className="card wide">
+      <div className="card-k">Learning loop</div>
+      <div className="card-v">
+        <p className={`hunger ${pending.length ? 'warn' : 'ok'}`}>
+          {hungerMsg || '…'} {pending.length > 0 && `· ${pending.length} awaiting your approval`}
+        </p>
+
+        <div className="targets">
+          {targets.map((t) => (
+            <div key={t.id} className="target-row">
+              <span className="target-name">
+                [{t.kind}] {t.name}
+              </span>
+              <span className="target-meta">
+                {t.last_researched
+                  ? `studied ${t.last_researched.slice(0, 10)}`
+                  : 'not yet studied'}
+              </span>
+              <button
+                disabled={busy === t.id}
+                onClick={() =>
+                  act(t.id, async () => {
+                    const r = await api.research(t.id)
+                    setNotice(
+                      r.ok
+                        ? `studied ${t.name}: ${r.added.length} new facts to review`
+                        : `study failed: ${r.error}`
+                    )
+                  })
+                }
+              >
+                {busy === t.id ? 'studying…' : 'study now'}
+              </button>
+              <button
+                className="ghost"
+                disabled={busy === t.id}
+                onClick={() => act(t.id, () => api.pauseTarget(t.id).then(() => {}))}
+              >
+                pause
+              </button>
+            </div>
+          ))}
+          {targets.length === 0 && <p className="muted">No targets yet — add one below.</p>}
+        </div>
+
+        <div className="add-row">
+          <input
+            placeholder="Name (e.g. Salon Kings)"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+          />
+          <input
+            placeholder="https://competitor-site.com"
+            value={form.url}
+            onChange={(e) => setForm({ ...form, url: e.target.value })}
+          />
+          <select
+            value={form.kind}
+            onChange={(e) => setForm({ ...form, kind: e.target.value })}
+          >
+            <option value="competitor">competitor</option>
+            <option value="market">market</option>
+            <option value="prospect">prospect</option>
+            <option value="resource">resource</option>
+          </select>
+          <button disabled={busy === 'new'} onClick={addTarget}>
+            {busy === 'new' ? 'adding…' : '+ add target'}
+          </button>
+        </div>
+
+        {notice && <p className="notice">{notice}</p>}
+
+        {pending.length > 0 && (
+          <div className="queue">
+            <div className="queue-title">Approval queue — nothing becomes memory without you</div>
+            {pending.slice(0, 8).map((f) => (
+              <div key={f.id} className="fact-row">
+                <span className="fact-text">{f.content}</span>
+                <span className="fact-src">{f.category}</span>
+                <button
+                  disabled={busy === f.id}
+                  onClick={() => act(f.id, () => api.approveFact(f.id).then(() => {}))}
+                >
+                  approve
+                </button>
+              </div>
+            ))}
+            {pending.length > 8 && (
+              <p className="muted">…and {pending.length - 8} more</p>
+            )}
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
 
 export default function App() {
   const health = usePolling<Health>(() => api.health(), 10_000)
@@ -110,6 +251,8 @@ export default function App() {
           {screens.data?.length ? `${screens.data.length} saved` : 'none yet'}
         </Card>
       </div>
+
+      <LearningLoop />
 
       <p className="status">
         {health.error

@@ -61,6 +61,23 @@ MIGRATIONS: list[tuple[int, str]] = [
         );
         """,
     ),
+    (
+        2,
+        """
+        -- Research targets: competitors, markets, prospects Gideon studies
+        CREATE TABLE IF NOT EXISTS targets (
+            id               INTEGER PRIMARY KEY AUTOINCREMENT,
+            name             TEXT NOT NULL,
+            url              TEXT NOT NULL,
+            kind             TEXT NOT NULL DEFAULT 'competitor',
+            notes            TEXT NOT NULL DEFAULT '',
+            active           INTEGER NOT NULL DEFAULT 1,
+            created_at       TEXT NOT NULL,
+            last_researched  TEXT
+        );
+        CREATE INDEX IF NOT EXISTS idx_targets_active ON targets(active);
+        """,
+    ),
 ]
 
 
@@ -74,13 +91,20 @@ def _connect(db_path: Path) -> sqlite3.Connection:
 
 
 def _ensure_schema(conn: sqlite3.Connection) -> None:
-    """Self-heal: apply migrations on first connection (fresh checkout safe)."""
-    row = conn.execute(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name='schema_migrations'"
-    ).fetchone()
-    if row is not None:
-        return
+    """Self-heal: apply PENDING migrations on first connection (fresh or old DB)."""
+    conn.execute(
+        """CREATE TABLE IF NOT EXISTS schema_migrations (
+                version INTEGER PRIMARY KEY,
+                applied_at TEXT NOT NULL
+            )"""
+    )
+    applied = {
+        row["version"]
+        for row in conn.execute("SELECT version FROM schema_migrations")
+    }
     for version, sql in MIGRATIONS:
+        if version in applied:
+            continue
         conn.executescript(sql)
         conn.execute(
             "INSERT INTO schema_migrations(version, applied_at) VALUES(?, ?)",
@@ -117,9 +141,9 @@ def init_db(db_path: Path | None = None) -> list[int]:
     try:
         conn.execute(
             """CREATE TABLE IF NOT EXISTS schema_migrations (
-                   version INTEGER PRIMARY KEY,
-                   applied_at TEXT NOT NULL
-               )"""
+                    version INTEGER PRIMARY KEY,
+                    applied_at TEXT NOT NULL
+                )"""
         )
         applied = {
             row["version"]

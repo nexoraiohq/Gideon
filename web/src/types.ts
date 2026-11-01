@@ -43,3 +43,48 @@ export interface ScreenItem {
   kind: string
   title: string
 }
+
+export interface Fact {
+  id: number
+  content: string
+  category: string
+  source_url: string | null
+  learned_at: string
+  approved: number
+}
+
+export interface HungerStatus {
+  day: string
+  items: number
+  chars: number
+  min_items: number
+  min_chars: number
+  hungry: boolean
+  message: string
+}
+
+export interface Target {
+  id: number
+  name: string
+  url: string
+  kind: string
+  notes: string
+  active: number
+  created_at: string
+  last_researched: string | null
+}
+
+export interface TargetsResponse {
+  items: Target[]
+  hunger: {
+    hunger: HungerStatus
+    active_targets: number
+    pending_approvals: number
+    approved_facts: number
+  }
+}
+
+export interface ApprovalsResponse {
+  items: Fact[]
+  pending: number
+}

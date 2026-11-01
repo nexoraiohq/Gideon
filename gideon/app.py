@@ -22,6 +22,7 @@ from gideon.config import WEB_DIR, get_settings
 from gideon.core import constitution, guardrail
 from gideon.knowledge import answer as knowledge_answer
 from gideon.knowledge import store as knowledge_store
+from gideon.knowledge import targets as knowledge_targets
 from gideon.llm import ollama_status
 from gideon.memory import db
 
@@ -109,6 +110,53 @@ def check(body: DraftText) -> JSONResponse:
     return JSONResponse(guardrail.check_draft(body.text).to_dict())
 
 
+# ---------------------------------------------------------------------------
+# Phase 3 — Learning loop: targets, research, approval queue
+# ---------------------------------------------------------------------------
+class TargetIn(BaseModel):
+    name: str
+    url: str
+    kind: str = "competitor"
+    notes: str = ""
+
+
+@app.get("/api/targets")
+def targets_list() -> JSONResponse:
+    items = knowledge_targets.list_targets()
+    return JSONResponse({"items": items, "hunger": knowledge_targets.hunger_report()})
+
+
+@app.post("/api/targets")
+def targets_add(body: TargetIn) -> JSONResponse:
+    try:
+        tid = knowledge_targets.add_target(body.name, body.url, body.kind, body.notes)
+    except ValueError as exc:
+        return JSONResponse({"detail": str(exc)}, status_code=400)
+    return JSONResponse({"target_id": tid}, status_code=201)
+
+
+@app.post("/api/targets/{target_id}/research")
+def targets_research(target_id: int) -> JSONResponse:
+    try:
+        result = knowledge_targets.research_target(target_id)
+    except ValueError as exc:
+        return JSONResponse({"detail": str(exc)}, status_code=404)
+    return JSONResponse(result, status_code=200 if result.get("ok") else 502)
+
+
+@app.post("/api/targets/{target_id}/pause")
+def targets_pause(target_id: int) -> JSONResponse:
+    if not knowledge_targets.pause_target(target_id):
+        return JSONResponse({"detail": "target not found"}, status_code=404)
+    return JSONResponse({"paused": True, "target_id": target_id})
+
+
+@app.get("/api/approvals")
+def approvals(limit: int = 100) -> JSONResponse:
+    queue = knowledge_targets.approval_queue(limit=limit)
+    return JSONResponse({"items": queue, "pending": len(queue)})
+
+
 @app.get("/")
 def index():  # no response annotation: mixed Response types, FastAPI skips model
     page = DIST_DIR / "index.html"
@@ -116,8 +164,8 @@ def index():  # no response annotation: mixed Response types, FastAPI skips mode
         return JSONResponse(
             {
                 "detail": "Frontend not built yet — run: "
-                          "cd web && npm install && npm run build "
-                          "(or npm run dev for development)"
+                            "cd web && npm install && npm run build "
+                            "(or npm run dev for development)"
             },
             status_code=404,
         )
