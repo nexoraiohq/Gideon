@@ -209,8 +209,11 @@ Search free tiers sufficient at start.
       (decision tiers, guardrails) encoded. **COMPLETE — 177 facts ingested from
       nexoraio.vercel.app with sources + approval gate; cited answers API (/api/ask);
       promise guardrail green/yellow/red (/api/check); 83/83 tests; pushed (`47a78e5`).**
-- [ ] **Phase 3 — Learning:** target-driven learning loop with approval UI. *Test: give it a
-      competitor URL → structured facts → approve → stored with source.*
+- [x] **Phase 3 — Learning:** target-driven learning loop with approval UI. **COMPLETE —
+      research targets (competitor/market/prospect/resource), targeted study → facts land
+      unapproved, approval queue API + dashboard panel, hunger reporting; live smoke: 134
+      new facts from a real site study; 96/96 tests; pushed (`d55008e`).**
+      *Test passed: URL → structured facts → approve → stored with source.*
 - [ ] **Phase 4 — Research engine:** morning sweep + watch list + opportunity detector +
       first morning briefing. *Test: wake up to a real briefing.*
 - [ ] **Phase 5 — Prospecting:** lead finder + scoring + pipeline/CRM. *Test: 10 real qualified
@@ -282,6 +285,6 @@ Search free tiers sufficient at start.
 
 ---
 
-*Status: Phase 2 COMPLETE — 177 Nexora facts learned (approval gate enforced), cited answers,
-promise guardrail live, 83/83 tests, pushed to GitHub. Next: Phase 3 — Learning loop
-(targeted research + approval UI). Workflow rule: pytest green → commit → push.*
+*Status: Phase 3 COMPLETE — learning loop live (targets → study → approval queue → memory),
+96/96 tests, dashboard UI with approval panel, pushed to GitHub. Next: Phase 4 — Research
+engine (morning sweep + watch list + first briefing). Workflow: pytest green → commit → push.*
